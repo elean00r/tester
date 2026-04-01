@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Watch Video</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+html,body{
+width:100%;
+height:100%;
+background:#000;
+font-family:Arial,Helvetica,sans-serif;
+color:#fff;
+}
+
+.watch-page{
+display:flex;
+flex-direction:column;
+width:100%;
+height:100vh;
+}
+
+.video-frame{
+position:relative;
+width:100%;
+flex:1;
+background:#000;
+}
+
+.video-frame iframe{
+width:100%;
+height:100%;
+border:0;
+display:block;
+}
+
+.share-btn{
+position:absolute;
+right:16px;
+bottom:16px;
+z-index:20;
+border:0;
+border-radius:999px;
+padding:12px 18px;
+background:rgba(0,0,0,0.65);
+color:#fff;
+font-size:14px;
+cursor:pointer;
+backdrop-filter:blur(8px);
+}
+
+.no-video{
+display:flex;
+justify-content:center;
+align-items:center;
+height:100%;
+font-size:16px;
+opacity:0.7;
+text-align:center;
+padding:20px;
+}
+</style>
+</head>
+
+<body>
+
+<main class="watch-page">
+
+<div class="video-frame">
+
+<iframe
+id="videoPlayer"
+allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+allowfullscreen>
+</iframe>
+
+<button class="share-btn" onclick="shareVideo()">Share</button>
+
+<div id="fallback" class="no-video" style="display:none;">
+Video tidak ditemukan / gagal dimuat
+</div>
+
+</div>
+
+</main>
+
+<script>
+// ambil parameter id
+const params = new URLSearchParams(window.location.search);
+let videoId = params.get("id");
+
+// 👉 DEFAULT ID biar bisa jalan di VS Code tanpa parameter
+if(!videoId){
+  videoId = "I0qRfHhX1"; // ganti ini kalau punya ID asli
+}
+
+// validasi
+function isValidId(id){
+  return /^[a-zA-Z0-9_-]+$/.test(id);
+}
+
+const player = document.getElementById("videoPlayer");
+const fallback = document.getElementById("fallback");
+
+if(videoId && isValidId(videoId)){
+  player.src = "https://videy.co/v/?id=" + videoId;
+
+  // kalau iframe gagal load
+  player.onerror = () => {
+    player.style.display = "none";
+    fallback.style.display = "flex";
+  };
+
+}else{
+  player.style.display = "none";
+  fallback.style.display = "flex";
+}
+
+// share function
+function shareVideo(){
+const currentUrl = window.location.href;
+
+if(navigator.share){
+navigator.share({
+title:'Watch Video',
+url:currentUrl
+}).catch(()=>{});
+}
+else if(navigator.clipboard){
+navigator.clipboard.writeText(currentUrl)
+.then(()=>alert('Link copied'))
+.catch(()=>prompt('Copy link:',currentUrl));
+}
+else{
+prompt('Copy link:',currentUrl);
+}
+}
+</script>
+
+</body>
+</html>
