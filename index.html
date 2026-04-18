@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MyTube Pro</title>
+<title>ONLINE</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -19,192 +19,299 @@ height:60px;
 display:flex;
 align-items:center;
 padding:0 20px;
-font-size:22px;
+border-bottom:1px solid #222;
 font-weight:bold;
 color:#e50914;
 }
 
-.player{
-max-width:1000px;
-margin:20px auto;
-padding:0 15px;
+.layout{
+display:flex;
+flex-direction:column;
+gap:15px;
+padding:20px;
+max-width:900px;
+margin:auto;
 }
 
+/* PLAYER */
 .player video{
 width:100%;
 border-radius:12px;
 background:#000;
 }
 
-.row{
-margin:20px;
+/* AUTHOR */
+.author{
+display:flex;
+align-items:center;
+gap:10px;
+font-size:14px;
+color:#bbb;
 }
 
-.row-title{
-margin-bottom:10px;
-font-size:18px;
+.avatar{
+width:32px;
+height:32px;
+border-radius:50%;
+background:#333;
+object-fit:cover;
 }
 
-.row-list{
+/* ACTIONS */
+.actions{
 display:flex;
 gap:10px;
-overflow-x:auto;
 }
 
-.row-list::-webkit-scrollbar{
-display:none;
-}
-
-.card{
-min-width:160px;
+.btn{
+background:#1f1f1f;
+border:none;
+padding:8px 14px;
+border-radius:20px;
+color:#fff;
 cursor:pointer;
-transition:.3s;
+}
+
+.btn:hover{
+background:#e50914;
+}
+
+/* GRID */
+.sidebar{
+display:grid;
+grid-template-columns:repeat(3, 1fr);
+gap:10px;
+}
+
+.item{
 position:relative;
-}
-
-.card img{
-width:100%;
 border-radius:10px;
+overflow:hidden;
+cursor:pointer;
+background:#111;
+transition:0.2s;
 }
 
-.card:hover{
-transform:scale(1.12);
-z-index:5;
+.item:hover{transform:scale(1.03)}
+
+.thumb{
+width:100%;
+aspect-ratio:16/9;
+object-fit:cover;
+display:block;
 }
 
 .play-icon{
 position:absolute;
-top:50%;
+top:45%;
 left:50%;
 transform:translate(-50%,-50%);
 font-size:28px;
 color:#fff;
-background:rgba(0,0,0,0.6);
-width:45px;
-height:45px;
+background:rgba(0,0,0,0.5);
+width:50px;
+height:50px;
 display:flex;
 align-items:center;
 justify-content:center;
 border-radius:50%;
-opacity:1;
-pointer-events:none;
+z-index:3;
 }
 
-.card-info{
+.preview-video{
 position:absolute;
-bottom:0;
+top:0;
 left:0;
-right:0;
-background:rgba(0,0,0,0.7);
-padding:5px;
-font-size:12px;
-border-radius:0 0 10px 10px;
+width:100%;
+height:100%;
+object-fit:cover;
+z-index:2;
+display:none;
 }
 
-@media(max-width:768px){
-.card{min-width:120px;}
+.item::after{
+content:"";
+position:absolute;
+inset:0;
+background:rgba(0,0,0,0.2);
+z-index:1;
+}
+
+/* 👇 CHANNEL NAME (NEW) */
+.channel{
+padding:6px 8px;
+font-size:12px;
+color:#aaa;
+background:#0f0f0f;
+border-top:1px solid #1f1f1f;
+}
+
+/* NAV BUTTONS */
+.nav-buttons{
+display:flex;
+justify-content:space-between;
+gap:10px;
+margin-top:10px;
+}
+
+.nav-buttons button{
+flex:1;
+padding:10px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+background:#1f1f1f;
+color:#fff;
+transition:0.2s;
+}
+
+.nav-buttons button:hover{
+background:#e50914;
+}
+
+@media(max-width:700px){
+.sidebar{
+grid-template-columns:repeat(2, 1fr);
+}
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">MyTube Pro</div>
+<div class="header">PlayNAW</div>
+
+<div class="layout">
 
 <!-- VIDEO -->
 <div class="player">
-  <video id="video" controls></video>
+<video id="video" controls preload="metadata"></video>
 </div>
 
-<!-- TRENDING -->
-<div class="row">
-  <div class="row-title">🔥 Trending Now</div>
-  <div class="row-list" id="trending"></div>
+<!-- AUTHOR -->
+<div class="author">
+<img id="avatar" class="avatar">
+<span id="authorName">PlayNAW</span>
 </div>
 
-<!-- RECOMMENDED -->
-<div class="row">
-  <div class="row-title">🎯 Recommended For You</div>
-  <div class="row-list" id="recommended"></div>
+<div class="actions">
+<button class="btn" onclick="share()">Share</button>
+</div>
+
+<!-- RECOMMEND -->
+<div class="sidebar" id="list"></div>
+
+<!-- NAV BUTTONS -->
+<div class="nav-buttons">
+<button onclick="prevVideo()">⬅ Prev</button>
+<button onclick="nextExternal()">Next ➜</button>
+</div>
+
 </div>
 
 <script>
-
-// =======================
-// MAIN DATABASE (SEMUA VIDEO)
-// =======================
-const videos = [
-{id:"b6ebtLM61",title:"Viral Explosion",thumb:"https://cdn.aceimg.com/4c6adc60f.png"},
-{id:"b6ebtLM61",title:"Crazy Moment",thumb:"https://cdn.aceimg.com/3722eb687.png"},
-{id:"b6ebtLM61",title:"Top Trending",thumb:"https://cdn.aceimg.com/256903f41.png"},
-{id:"b6ebtLM61",title:"Must Watch",thumb:"https://cdn.aceimg.com/abf8849c1.png"},
-{id:"b6ebtLM61",title:"Unbelievable",thumb:"https://cdn.aceimg.com/be92c85b8.png"},
-{id:"FB52GziE1",title:"🔥 Insane Clip",thumb:"https://cdn.aceimg.com/e5cb87f28.png"},
-{id:"JL8naMl81",title:"Best Video",thumb:"https://cdn.aceimg.com/2dad0740c.png"},
-{id:"8KQyvCLb1",title:"Hot Right Now",thumb:"https://cdn.aceimg.com/547cf763d.png"},
-{id:"8KQyvCLb1",title:"Hot Right Now",thumb:"https://cdn.aceimg.com/e596a8f6a.png"},
-{id:"8KQyvCLb1",title:"Hot Right Now",thumb:"https://cdn.aceimg.com/fe63b5d23.png"}
-];
-
-// =======================
-// SHUFFLE FUNCTION
-// =======================
-function shuffle(arr){
-  return arr.sort(() => Math.random() - 0.5);
-}
-
-// =======================
-// GET CURRENT VIDEO
-// =======================
 const params = new URLSearchParams(location.search);
 let id = params.get("id") || "I0qRfHhX1";
 
 const video = document.getElementById("video");
+const list = document.getElementById("list");
+const authorName = document.getElementById("authorName");
+const avatar = document.getElementById("avatar");
+
 video.src = "https://cdn2.videy.co/" + id + ".mp4";
 
-// =======================
-// FILTER OUT CURRENT VIDEO
-// =======================
-const available = videos.filter(v => v.id !== id);
+/* DATA */
+const videos = [
+{id:"b6ebtLM61",thumb:"https://cdn.aceimg.com/4c6adc60f.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"b6ebtLM61",thumb:"https://cdn.aceimg.com/3722eb687.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"b6ebtLM61",thumb:"https://cdn.aceimg.com/256903f41.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"b6ebtLM61",thumb:"https://cdn.aceimg.com/abf8849c1.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"b6ebtLM61",thumb:"https://cdn.aceimg.com/be92c85b8.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"FB52GziE1",thumb:"https://cdn.aceimg.com/e5cb87f28.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"JL8naMl81",thumb:"https://cdn.aceimg.com/2dad0740c.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"8KQyvCLb1",thumb:"https://cdn.aceimg.com/547cf763d.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"8KQyvCLb1",thumb:"https://cdn.aceimg.com/e596a8f6a.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"},
+{id:"8KQyvCLb1",thumb:"https://cdn.aceimg.com/fe63b5d23.png", author:"Music Vibes", avatar:"https://i.pravatar.cc/40?img=6"}
+];
 
-// =======================
-// SEPARATE DATA (IMPORTANT PART)
-// =======================
+/* CURRENT */
+const currentIndex = videos.findIndex(v => v.id === id);
+const current = videos[currentIndex];
 
-// 🔥 TRENDING = random 5 video
-const trending = shuffle([...available]).slice(0,5);
-
-// 🎯 RECOMMENDED = different set (no overlap)
-const remainingForRecommended = available.filter(v => !trending.includes(v));
-const recommended = shuffle([...remainingForRecommended]).slice(0,6);
-
-// =======================
-// RENDER FUNCTION
-// =======================
-function render(containerId, data){
-  const container = document.getElementById(containerId);
-
-  data.forEach(v=>{
-    const card = document.createElement("div");
-    card.className = "card";
-    card.onclick = () => location.search = "?id=" + v.id;
-
-    card.innerHTML = `
-      <img src="${v.thumb}">
-      <div class="play-icon">▶</div>
-      <div class="card-info">${v.title}</div>
-    `;
-
-    container.appendChild(card);
-  });
+if(current){
+  authorName.innerText = current.author;
+  avatar.src = current.avatar;
 }
 
-// =======================
-// LOAD UI
-// =======================
-render("trending", trending);
-render("recommended", recommended);
+/* RENDER */
+videos.forEach(v=>{
+  if(v.id === id) return;
 
+  const div = document.createElement("div");
+  div.className = "item";
+
+  div.innerHTML = `
+    <img src="${v.thumb}" class="thumb">
+    <div class="play-icon">▶</div>
+    <video class="preview-video" muted></video>
+
+    <!-- 👇 CHANNEL NAME -->
+    <div class="channel">${v.author}</div>
+  `;
+
+  const preview = div.querySelector("video");
+  preview.src = "https://cdn2.videy.co/" + v.id + ".mp4";
+
+  div.addEventListener("mouseenter", async () => {
+    preview.style.display = "block";
+    try { await preview.play(); } catch(e){}
+    preview._t = setTimeout(()=>{
+      preview.pause();
+      preview.currentTime = 0;
+      preview.style.display = "none";
+    },2000);
+  });
+
+  div.addEventListener("mouseleave", () => {
+    clearTimeout(preview._t);
+    preview.pause();
+    preview.currentTime = 0;
+    preview.style.display = "none";
+  });
+
+  div.addEventListener("click", () => {
+    location.search = "?id=" + v.id;
+  });
+
+  list.appendChild(div);
+});
+
+/* SHARE */
+function share(){
+  navigator.clipboard.writeText(location.href);
+  alert("Link copied");
+}
+
+/* PREV */
+function prevVideo(){
+  if(currentIndex > 0){
+    location.search = "?id=" + videos[currentIndex - 1].id;
+  }else{
+    location.search = "?id=" + videos[videos.length - 1].id;
+  }
+}
+
+/* NEXT EXTERNAL */
+function nextExternal(){
+  window.location.href = "https://videoy.online";
+}
+
+/* AUTO NEXT */
+video.addEventListener("ended", () => {
+  const random = videos[Math.floor(Math.random() * videos.length)];
+  location.search = "?id=" + random.id;
+});
 </script>
 
 </body>
