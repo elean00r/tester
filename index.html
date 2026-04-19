@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta name="clckd" content="6f2b7530d3dd593cdad60204559f161f" />
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PlayNaw Online</title>
-
-<meta name="referrer" content="no-referrer-when-downgrade">
+<title>Videoy ONLINE</title>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -39,17 +37,28 @@ border-radius:12px;
 background:#000;
 }
 
-/* 🔥 CHANNEL STYLE */
-.channel-box{
+/* 🔥 CHANNEL SECTION */
+.main-channel{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-top:12px;
+padding:12px;
+background:#111;
+border-radius:12px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.channel-left{
 display:flex;
 align-items:center;
 gap:10px;
-margin-top:10px;
 }
 
-.channel-box img{
-width:35px;
-height:35px;
+.channel-left img{
+width:45px;
+height:45px;
 border-radius:50%;
 }
 
@@ -60,15 +69,43 @@ flex-direction:column;
 
 .channel-name{
 font-weight:bold;
-font-size:14px;
+font-size:15px;
 }
 
-.channel-sub{
+.channel-meta{
 font-size:12px;
 color:#aaa;
 }
 
-/* 🔥 RECOMMEND */
+/* BUTTONS */
+.channel-actions{
+display:flex;
+gap:10px;
+}
+
+.btn-follow{
+background:#ff9900;
+border:none;
+padding:8px 14px;
+border-radius:6px;
+color:#000;
+font-weight:bold;
+cursor:pointer;
+}
+
+.btn-join{
+background:transparent;
+border:1px solid #ff9900;
+padding:8px 14px;
+border-radius:6px;
+color:#ff9900;
+cursor:pointer;
+}
+
+.btn-follow:hover{opacity:0.9}
+.btn-join:hover{background:#ff9900;color:#000}
+
+/* RECOMMEND */
 .recommend{
 margin-top:20px;
 display:grid;
@@ -82,49 +119,44 @@ border-radius:10px;
 overflow:hidden;
 cursor:pointer;
 background:#111;
-transition:0.2s;
 }
 
-.item:hover{transform:scale(1.03)}
-
+/* THUMB */
 .thumb{
 width:100%;
 aspect-ratio:16/9;
 object-fit:cover;
-display:block;
 }
 
+/* 🔥 PLAY ICON */
 .play-icon{
 position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-background:rgba(0,0,0,0.6);
 width:50px;
 height:50px;
+background:rgba(0,0,0,0.6);
 border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
 font-size:20px;
+color:#fff;
+transition:0.3s;
 }
 
-.preview-video{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-object-fit:cover;
-display:none;
+/* HOVER EFFECT */
+.item:hover .play-icon{
+background:#e50914;
+transform:translate(-50%,-50%) scale(1.1);
 }
 
+/* CHANNEL */
 .channel{
 padding:6px;
 font-size:12px;
 color:#aaa;
-background:#0f0f0f;
-border-top:1px solid #1f1f1f;
 display:flex;
 align-items:center;
 gap:5px;
@@ -136,182 +168,169 @@ height:20px;
 border-radius:50%;
 }
 
-.actions{
-margin-top:10px;
-display:flex;
-gap:10px;
-}
-
-.btn{
-background:#1f1f1f;
-border:none;
-padding:8px 14px;
-border-radius:20px;
-color:#fff;
+.view-more{
+margin-top:25px;
+text-align:center;
 cursor:pointer;
-}
-
-.btn:hover{
-background:#e50914;
+color:#aaa;
 }
 
 @media(max-width:700px){
-.recommend{
-grid-template-columns:repeat(2,1fr);
-}
+.recommend{grid-template-columns:repeat(2,1fr);}
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">MyTube</div>
+<div class="header">VideOY ONLINE</div>
 
 <div class="layout">
 
-<!-- 🔴 BANNER -->
-<div style="margin-bottom:15px;text-align:center;">
-
-</div>
-
 <div class="player">
-<video id="video" controls preload="metadata"></video>
+<video id="video" controls></video>
 </div>
 
-<!-- 🔥 CHANNEL INFO (YOUTUBE STYLE) -->
-<div class="channel-box" id="channelBox"></div>
+<!-- 🔥 CHANNEL -->
+<div class="main-channel" id="mainChannel"></div>
 
-<div class="actions">
-<button class="btn" onclick="share()">Share</button>
-</div>
-
-<!-- 🔥 RECOMMEND -->
 <div class="recommend" id="list"></div>
 
-</div>
+<div class="view-more" onclick="goMore()">VIEW MORE</div>
 
-<!-- 🔴 FLOATING ADS -->
-<div style="position:fixed;bottom:10px;left:50%;transform:translateX(-50%);z-index:9999;"></div>
+</div>
 
 <script>
 
 const params = new URLSearchParams(location.search);
-let id = params.get("id") || "I0qRfHhX1";
+let id = params.get("id") || "2PuPDhgq1";
 
 const video = document.getElementById("video");
-const channelBox = document.getElementById("channelBox");
+const mainChannel = document.getElementById("mainChannel");
 const list = document.getElementById("list");
 
-function valid(i){
-  return /^[a-zA-Z0-9_-]+$/.test(i);
-}
-
-/* 🔥 DATA VIDEO */
 const videos = [
-{id:"2PuPDhgq1",thumb:"https://cdn.aceimg.com/64ae3c00e.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"6GGd2Ah21",thumb:"https://cdn.aceimg.com/37b0ccb06.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"9KTubcAo1",thumb:"https://cdn.aceimg.com/dd04108e1.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"auvBrlko1",thumb:"https://cdn.aceimg.com/e894a6fa5.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"BcKWWEEX1",thumb:"https://cdn.aceimg.com/5a20cb7fa.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"bHQcsieZ1",thumb:"https://cdn.aceimg.com/ecc690109.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"f194f47f1",thumb:"https://cdn.aceimg.com/e4e1b0276.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"h4pJqNKT1",thumb:"https://cdn.aceimg.com/67de286cc.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"i39zjhHL1",thumb:"https://cdn.aceimg.com/5082cf83f.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"P2JvpjL61",thumb:"https://cdn.aceimg.com/75f67e1ef.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"tWrpI4t71",thumb:"https://cdn.aceimg.com/7dd8ded4d.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"},
-{id:"K0FqNyYX1",thumb:"https://cdn.aceimg.com/8daaf0c31.jpg", author:"Music Vibes", avatar:"https://cdn.aceimg.com/c90e7a7f2.jpg"}
+{id:"2RUb0Ci91",thumb:"https://cdn.aceimg.com/f129a271f.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"4JvPvFsj1",thumb:"https://cdn.aceimg.com/39bd56b70.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"6QVMOXCv1",thumb:"https://cdn.aceimg.com/452340590.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"7DdL8STp1",thumb:"https://cdn.aceimg.com/9ca056741.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"8KQyvCLb1",thumb:"https://cdn.aceimg.com/8e83d47d0.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"8vVCD4WA1",thumb:"https://cdn.aceimg.com/2f05bde93.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"AWMj4DfH1",thumb:"https://cdn.aceimg.com/8a30bf57c.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"aXFcQ36W1",thumb:"https://cdn.aceimg.com/a6ccbb12a.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"C2IdO9Kj1",thumb:"https://cdn.aceimg.com/3161e5a3b.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"HyOg4NnI1",thumb:"https://cdn.aceimg.com/e76e56253.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"i1yOlplj1",thumb:"https://cdn.aceimg.com/23f33a2b1.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"iRSgtDsh1",thumb:"https://cdn.aceimg.com/a62caa432.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"itql7h271",thumb:"https://cdn.aceimg.com/88c3e5971.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"iUPq9GTj1",thumb:"https://cdn.aceimg.com/16a2f37eb.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"JFlWnw6Z1",thumb:"https://cdn.aceimg.com/312824e59.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"K8W6e80T1",thumb:"https://cdn.aceimg.com/568faa414.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"l6vfpKVt1",thumb:"https://cdn.aceimg.com/72729dca6.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"MsxOKhFm1",thumb:"https://cdn.aceimg.com/d27576a45.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"nFZL3N1s1",thumb:"https://cdn.aceimg.com/0c2e2f0fd.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"nQnwB7XW1",thumb:"https://cdn.aceimg.com/3a8e21716.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"NtJtm5sn1",thumb:"https://cdn.aceimg.com/0827a57f1.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"OTsDDKCs1",thumb:"https://cdn.aceimg.com/597cea769.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"rbWOld2y1",thumb:"https://cdn.aceimg.com/9b7e0a004.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"rKbiNDn51",thumb:"https://cdn.aceimg.com/ae9d3595f.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"sJzbXWEW1",thumb:"https://cdn.aceimg.com/1cec26fe0.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"sZpHGjrU1",thumb:"https://cdn.aceimg.com/937f9dfc9.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"T3eiJGy31",thumb:"https://cdn.aceimg.com/9600493ba.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"U0uTtqAt1",thumb:"https://cdn.aceimg.com/5fdc9207b.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"vE0bHZgZ1",thumb:"https://cdn.aceimg.com/6bd422c01.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"YzQbwik81",thumb:"https://cdn.aceimg.com/ef2a63541.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"ZX8qsE4K1",thumb:"https://cdn.aceimg.com/44d43a773.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"ZXiiY9Yl1",thumb:"https://cdn.aceimg.com/0d09413d7.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"},
+{id:"ZzQhvhSI1",thumb:"https://cdn.aceimg.com/51554d068.jpg", author:"Eleanor", avatar:"https://cdn.aceimg.com/1e8e7d3f8.jpg"}
 ];
 
 const currentVideo = videos.find(v=>v.id===id);
 
-/* 🔥 MAIN VIDEO */
-if(valid(id)){
-  video.src = "https://cdn2.videy.co/" + id + ".mp4";
+video.src = "https://cdn2.videy.co/" + id + ".mp4";
 
-  if(currentVideo){
-    channelBox.innerHTML = `
+/* 🔥 CHANNEL RENDER */
+if(currentVideo){
+  mainChannel.innerHTML = `
+    <div class="channel-left">
       <img src="${currentVideo.avatar}">
       <div class="channel-info">
         <div class="channel-name">${currentVideo.author}</div>
-        <div class="channel-sub">Official Channel</div>
       </div>
-    `;
-  }else{
-    channelBox.innerHTML = `
-      <div class="channel-name">PlayNAW</div>
-    `;
-  }
-}
+    </div>
 
-/* 🔥 RENDER RECOMMEND */
-videos.forEach(v=>{
-  if(v.id === id) return;
-
-  const div = document.createElement("div");
-  div.className = "item";
-
-  div.innerHTML = `
-    <img src="${v.thumb}" class="thumb">
-    <div class="play-icon">▶</div>
-    <video class="preview-video" muted></video>
-
-    <div class="channel">
-      <img src="${v.avatar}">
-      ${v.author}
+    <div class="channel-actions">
+      <button class="btn-follow" onclick="followPage()">Follow My Page</button>
+      <button class="btn-join" onclick="joinGroup()">Join My Group</button>
     </div>
   `;
-
-  const preview = div.querySelector("video");
-  preview.src = "https://cdn2.videy.co/" + v.id + ".mp4";
-
-  div.addEventListener("mouseenter", async () => {
-    preview.style.display = "block";
-    try{ await preview.play(); }catch(e){}
-    preview._t = setTimeout(()=>{
-      preview.pause();
-      preview.currentTime = 0;
-      preview.style.display = "none";
-    },2000);
-  });
-
-  div.addEventListener("mouseleave", () => {
-    clearTimeout(preview._t);
-    preview.pause();
-    preview.currentTime = 0;
-    preview.style.display = "none";
-  });
-
-  div.addEventListener("click", () => {
-    location.search = "?id=" + v.id;
-  });
-
-  list.appendChild(div);
-});
-
-/* SHARE */
-function share(){
-  navigator.clipboard.writeText(location.href);
-  alert("Link copied");
 }
 
-/* 🔥 REDIRECT IKLAN (TETAP) */
-setTimeout(() => {
-  if(!sessionStorage.getItem("redirected")){
-    sessionStorage.setItem("redirected", "yes");
-    window.open("https://dutchrelay.com/pmy9zqw6ug?key=ff6ee12c4ad4389fd54f705d80b8b55d", "_blank");
-  }
-}, 10000);
+/* 🔥 BUTTON ACTION */
+function followPage(){
+  window.open("https://www.facebook.com/profile.php?id=61587017235092","_blank");
+}
 
-/* AUTO NEXT */
-video.addEventListener("ended", () => {
-  const random = videos[Math.floor(Math.random()*videos.length)];
-  location.search = "?id=" + random.id;
-});
+function joinGroup(){
+  window.open("https://www.facebook.com/groups/2072838213495669","_blank");
+}
+
+/* LAZY LOAD */
+let visible = 6;
+
+function render(){
+  list.innerHTML="";
+  videos.slice(0,visible).forEach(v=>{
+    const div=document.createElement("div");
+    div.className="item";
+    div.innerHTML=`
+      <img src="${v.thumb}" class="thumb" loading="lazy">
+
+      <!-- 🔥 PLAY ICON -->
+      <div class="play-icon">▶</div>
+
+      <div class="channel">
+        <img src="${v.avatar}">
+        ${v.author}
+      </div>
+    `;
+    div.onclick=()=>location.search="?id="+v.id;
+    list.appendChild(div);
+  });
+}
+
+render();
+
+function goMore(){
+  visible+=6;
+  render();
+}
 
 </script>
 
-<!-- POPUNDER -->
-<script src="https://dutchrelay.com/73/ed/07/73ed0749fb832c6d6f88048a2e5c9591.js"></script>
+<!-- 🔥 HISTATS TRACKING -->
+<!-- Histats.com  START  (aync)-->
+<script type="text/javascript">
+var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,4965497,4,0,0,0,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+
+(function() {
+var hs = document.createElement('script'); 
+hs.type = 'text/javascript'; 
+hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();
+</script>
+
+<noscript>
+<a href="/" target="_blank">
+<img src="//sstatic1.histats.com/0.gif?4965497&101" alt="" border="0">
+</a>
+</noscript>
+<!-- Histats.com  END  -->
 
 </body>
 </html>
